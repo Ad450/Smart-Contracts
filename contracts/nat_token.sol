@@ -10,16 +10,16 @@ import "./token_interface.sol";
 contract NatToken is IERC20 {
 
 
-    constructor ()public {
+    constructor () {
         owner = msg.sender;
-        totalSupply = 100 * 10**18;
-        balances[owner] = totalSupply;
+        supply = 100 * 10**18;
+        balances[msg.sender] = supply;
     }
 
     string constant private NAME =  "Nat token";
     string constant private SYMBOL =  "NAT";
-    uint private totalSupply;
-    uint constant private DECIMALS = 18;
+    uint private supply;
+    uint8 constant private DECIMALS = 18;
 
     address public owner;
 
@@ -45,15 +45,15 @@ contract NatToken is IERC20 {
   @returns returns a number representing the number behind the decimal point
    */
   function decimals() public view override returns (uint8){
-      return DECIMAL;
+      return DECIMALS;
   }
 
     /*
-  @notice totalSupply is the the total amount of tokens in circulation or in the network
+  @notice supply is the the total amount of tokens in circulation or in the network
   @returns returns the number of tokens
    */
   function totalSupply() public view override returns (uint256){
-      return totalSupply;
+      return supply;
   }
 
     /*
@@ -119,7 +119,7 @@ contract NatToken is IERC20 {
    */
   function _mint (uint _value) private {
       require (msg.sender == owner, "not authorized");
-      totalSupply += _value;
+      supply += _value;
   }
 
 /*
@@ -127,7 +127,7 @@ contract NatToken is IERC20 {
    */
   function __confiscate (address _bearer) private {
       require (msg.sender == owner, "not authorized");
-      totalSupply -= balances[_bearer];
+      supply -= balances[_bearer];
       balances[_bearer] = 0;
   }
 
