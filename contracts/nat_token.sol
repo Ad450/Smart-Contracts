@@ -86,7 +86,8 @@ contract NatToken is IERC20 {
   @returns returns a boolean if operation is successful
    */
   function transferFrom(address _from, address _to, uint256 _value) public override returns (bool){
-     require (balances[_from] >= _value, "insufficient balance");
+      require (_from != address(0), "invalid address");
+      require (balances[_from] >= _value, "insufficient balance");
       require (_to != address(0), "address not found");
 
       balances[msg.sender] -= _value;
