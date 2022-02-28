@@ -1,11 +1,12 @@
 /* eslint-disable prettier/prettier */
-import { expect } from "chai";
+import { assert, expect } from "chai";
 
 /* eslint-disable node/no-missing-import */
 import { ethers } from "hardhat";
 import { NatToken } from "../typechain/NatToken";
+import * as BigNumber from "bignumber.js";
 
-describe("NatToken", function () {
+describe("NatToken", () => {
   let natToken: NatToken;
   beforeEach(async () => {
     const NatToken = await ethers.getContractFactory("NatToken");
@@ -42,10 +43,43 @@ describe("NatToken", function () {
   });
 
   it("should return totalSupply ", async () => {
+    // arrange
+    const supply = new BigNumber.BigNumber(100 * 10 ** 18);
+
     // act
     const result = await natToken.totalSupply();
+    const parsedResult = new BigNumber.BigNumber(result.toString());
 
     // assert
-    // expect(result).equals(ethers.utils.);
+    assert(parsedResult.minus(supply).toString, "0");
+  });
+
+  it("should revert when address is a zero address", async () => {
+    // assert
+    try {
+      await natToken.balanceOf("0");
+    } catch (error) {
+      expect(error).toString().includes("invalid address");
+    }
+
+    // expect(await natToken.balanceOf("0x"))
+    //   .throws(new Error())
+    //   .includes("invalid address");
+  });
+
+  it("should return a number between 0 and 100, 0 inclusive", async () => {
+    // arrange
+    const testAddress: string = "0xbda5747bfd65f08deb54cb465eb87d40e51b197e";
+
+    const supply = new BigNumber.BigNumber(100 * 10 ** 18);
+    const parsedSupply = new BigNumber.BigNumber(supply.toString());
+
+    const result = await natToken.balanceOf(testAddress);
+    const parsedResult = new BigNumber.BigNumber(result.toString());
+
+    // assert
+    expect(result._isBigNumber);
+    expect(!result.isNegative);
+    expect(parsedSupply <= parsedResult);
   });
 });
