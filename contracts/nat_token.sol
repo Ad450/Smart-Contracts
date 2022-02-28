@@ -62,6 +62,7 @@ contract NatToken is IERC20 {
   @returns returns the balance of the address
    */
   function balanceOf(address _owner) public view override returns (uint256){
+      require(_owner != address(0), "invalid address");
       return balances[_owner];
   }
 
@@ -72,7 +73,8 @@ contract NatToken is IERC20 {
   @returns returns a boolean if transfer is successful
    */
   function transfer(address _to, uint256 _value) public override returns (bool){
-     return transferFrom(msg.sender, _to, _value);
+      require (_to != address(0), "invalid address");
+      return transferFrom(msg.sender, _to, _value);
   }
 
     /*
