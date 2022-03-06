@@ -1,11 +1,11 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
-/// @title NAT TOKEN   
+/// @title NAT TOKEN OWNERBLE
 /// @author Emmanuel
 /// @notice an interface that guides the the NAT token
 /// @dev A token standard based on the ERC20 standards
 
-contract Ownerable {
+contract Ownerble {
     address public owner;
 
     address public newOwner;
