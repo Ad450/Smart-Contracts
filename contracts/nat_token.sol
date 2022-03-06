@@ -120,7 +120,7 @@ contract NatToken is IERC20 {
     /*
   @notice adding new tokens 
    */
-  function _mint (uint _value) private {
+  function mint (uint _value) private {
       require (msg.sender == owner, "not authorized");
       supply += _value;
   }
@@ -128,7 +128,7 @@ contract NatToken is IERC20 {
 /*
   @notice seize tokens of an address for any misconduct such as fraud
    */
-  function __confiscate (address _bearer) private {
+  function confiscate (address _bearer) public {
       require (msg.sender == owner, "not authorized");
       supply -= balances[_bearer];
       balances[_bearer] = 0;
