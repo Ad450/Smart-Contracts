@@ -50,7 +50,7 @@ describe("Nat Token", () => {
       const amount: BigInt = BigInt(80 * 10 ** 18);
 
       // transfering 80NAT to wallets[1].address
-      // balance of msg.sender , in this case wallets[0].address has 80NAT
+      // balance of msg.sender , in this case wallets[0].address has 20NAT
       await natToken.transfer(wallets[1].address, amount);
 
       // assert
@@ -89,7 +89,7 @@ describe("Nat Token", () => {
       const amount: BigInt = BigInt(80 * 10 ** 18);
 
       // transfering 80NAT to wallets[1].address
-      // balance of msg.sender , in this case wallets[0].address has 80NAT
+      // balance of msg.sender , in this case wallets[0].address has 20NAT
       await natToken.transferFrom(
         wallets[0].address,
         wallets[1].address,
