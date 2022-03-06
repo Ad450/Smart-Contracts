@@ -104,5 +104,13 @@ describe("Nat Token", () => {
     });
   });
 
-  describe("");
+  // describe("confiscate", async () => {
+  //   // act
+  //   await natToken.confiscate(wallets[1].address);
+
+  //   // assert
+  //   expect(
+  //     ethers.utils.formatEther(await natToken.balanceOf(wallets[1].address))
+  //   ).equals("0.0");
+  // });
 });
