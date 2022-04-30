@@ -14,8 +14,8 @@ contract NatTokenOwnerble is NatToken {
         _owner = msg.sender;
     }
 
-    //@notice to transfer ownership of contract to another address
-    //@params _newOwner is the address to take over ownership
+    /// @notice to transfer ownership of contract to another address
+    /// @param _newOwner is the address to take over ownership
     function transferOwnership(address _newOwner) public {
         require(msg.sender == _owner, "only owners can call this method");
         require(_newOwner != address(0), "address doesnot exist");
