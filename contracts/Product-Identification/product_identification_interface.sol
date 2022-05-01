@@ -28,14 +28,14 @@ contract ProductIndentification {
     function addProduct(Product memory _product) public {}
 
     /// @notice computeHash produces the hash of the id of the product
-    /// @param _product is the product to be hashed
+    /// @param _productCode is the code of the product to be hashed
     /// @dev can be optimised to save gas
-    function computeHash(Product memory _product)
+    function computeHash(string memory _productCode)
         internal
         pure
         returns (bytes32)
     {
-        bytes32 _productHash = keccak256(abi.encodePacked(_product.id));
+        bytes32 _productHash = keccak256(abi.encodePacked(_productCode));
         return _productHash;
     }
 }
