@@ -5,7 +5,7 @@ pragma solidity ^0.8.4;
 /// @title Product Identification System
 /// @dev all functions are still under development
 contract ProductIndentification {
-    ///@notice isAdded to check if product has already been added
+    /// @notice isAdded to check if product has already been added
     bool private isAdded = false;
 
     /// @notice productAdded event will be fired when any product is added
@@ -99,12 +99,23 @@ contract ProductIndentification {
 
     /// @notice check if product with @param _productCode exist under an address
     /// @param _productCode is the product code of the product
+    /// @param _manufacturerAddress is the address of the manufacturer
     /// @return isFound is either true or false based on the search result
-    function searchProduct(string memory _productCode)
-        public
-        view
-        returns (bool)
-    {}
+    function searchProduct(
+        string memory _productCode,
+        address _manufacturerAddress
+    ) public view returns (bool) {
+        uint256 arrayLength = productStore[_manufacturerAddress].length;
+        bytes32 _productHash = _computeHash(_productCode);
+
+        for (uint256 i = 0; i < arrayLength; i++) {
+            if (productStore[_manufacturerAddress][i] == _productHash) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// @notice register manufacturers by under their names
     /// @param _manufacturer is the the name of the manufacturer
