@@ -64,11 +64,8 @@ contract ProductIndentification {
         for (uint256 i = 0; i < arrayLength; i++) {
             if (_productHash == productStore[_manufacturerAddress][i]) {
                 revert("product already added");
-            }
-        }
-        // add product if not added already
-        for (uint256 i = 0; i < arrayLength; i++) {
-            if (_productHash != productStore[_manufacturerAddress][i]) {
+                // else product is not yet added
+            } else {
                 productStore[_manufacturerAddress].push(_productHash);
                 emit ProductAdded();
             }
