@@ -5,9 +5,6 @@ pragma solidity ^0.8.4;
 /// @title Product Identification System
 /// @dev all functions are still under development
 contract ProductIndentification {
-    /// @notice isAdded to check if product has already been added
-    bool private isAdded = false;
-
     /// @notice productAdded event will be fired when any product is added
     event ProductAdded();
 
@@ -23,6 +20,7 @@ contract ProductIndentification {
         string code;
         uint256 id;
         uint256 date;
+        bool isAdded;
     }
 
     /// @notice keeping tracks of companies and their products
@@ -59,27 +57,20 @@ contract ProductIndentification {
         string memory _code,
         string memory _manufacturer
     ) public onylManufacturer(_manufacturer, _manufacturerAddress) {
-        Product memory _product = Product(
-            _manufacturerAddress,
-            _manufacturer,
-            _code,
-            id,
-            date
-        );
-
-        require(!isAdded, "product already added");
         uint256 arrayLength = productStore[_manufacturerAddress].length;
+        bytes32 _productHash = _computeHash(_code);
 
-        bytes32 _productHash = _computeHash(_product.code);
+        // checkif product already exist on chain
         for (uint256 i = 0; i < arrayLength; i++) {
-            if (!isAdded) {
-                if (_productHash == productStore[_manufacturerAddress][i]) {
-                    productStore[_manufacturerAddress].push(_productHash);
-                    isAdded = true;
-                    emit ProductAdded();
-                }
-            } else {
+            if (_productHash == productStore[_manufacturerAddress][i]) {
                 revert("product already added");
+            }
+        }
+        // add product if not added already
+        for (uint256 i = 0; i < arrayLength; i++) {
+            if (_productHash != productStore[_manufacturerAddress][i]) {
+                productStore[_manufacturerAddress].push(_productHash);
+                emit ProductAdded();
             }
         }
     }
