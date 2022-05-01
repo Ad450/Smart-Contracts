@@ -30,7 +30,8 @@ contract ProductIndentification {
     /// @notice computeHash produces the hash of the id of the product
     /// @param _productCode is the code of the product to be hashed
     /// @dev can be optimised to save gas
-    function computeHash(string memory _productCode)
+    /// @return _productHash the hash of the code of the product
+    function _computeHash(string memory _productCode)
         internal
         pure
         returns (bytes32)
@@ -38,4 +39,13 @@ contract ProductIndentification {
         bytes32 _productHash = keccak256(abi.encodePacked(_productCode));
         return _productHash;
     }
+
+    /// @notice check if product with @param _productCode exist under an address
+    /// @param _productCode is the product code of the product
+    /// @return isFound is either true or false based on the search result
+    function searchProduct(string memory _productCode)
+        public
+        view
+        returns (bool)
+    {}
 }
