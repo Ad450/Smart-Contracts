@@ -56,7 +56,7 @@ contract ProductIndentification {
         address _manufacturerAddress,
         string memory _code,
         string memory _manufacturer
-    ) public onylManufacturer(_manufacturer, _manufacturerAddress) {
+    ) public onlyManufacturer(_manufacturer, _manufacturerAddress) {
         uint256 arrayLength = productStore[_manufacturerAddress].length;
         bytes32 _productHash = _computeHash(_code);
 
