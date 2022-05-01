@@ -33,7 +33,7 @@ contract ProductIndentification {
     /// @notice onlyManufacturer requires manufacturer to be registered
     /// @param _manufacturer is the name of the manufacturer
     /// @param _manufacturerAddress is the address of manufacturer
-    modifier onylManufacturer(
+    modifier onlyManufacturer(
         string memory _manufacturer,
         address _manufacturerAddress
     ) {
