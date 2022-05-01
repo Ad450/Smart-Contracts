@@ -20,10 +20,22 @@ contract ProductIndentification {
 
     /// @notice keeping tracks of companies and their products
     /// @dev this mapping can be advanced with address => Product[]
-    mapping(address => Product) private companyProducts;
+    mapping(address => Product[]) private productStore;
 
     /// @notice companies will add products with this method
     /// @param _product is the product to be added
     /// @dev function still under development
     function addProduct(Product memory _product) public {}
+
+    /// @notice computeHash produces the hash of the id of the product
+    /// @param _product is the product to be hashed
+    /// @dev can be optimised to save gas
+    function computeHash(Product memory _product)
+        internal
+        pure
+        returns (bytes32)
+    {
+        bytes32 _productHash = keccak256(abi.encodePacked(_product.id));
+        return _productHash;
+    }
 }
