@@ -14,12 +14,17 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Token = await ethers.getContractFactory("NatToken");
-  const token = await Token.deploy();
+  const ProductIdentification = await ethers.getContractFactory(
+    "ProductIdentification"
+  );
+  const productIdentification = await ProductIdentification.deploy();
 
-  await token.deployed();
+  await productIdentification.deployed();
 
-  console.log("Token deployed to:", token.address);
+  console.log(
+    " Product Identification Contract deployed to:",
+    productIdentification.address
+  );
 }
 
 // We recommend this pattern to be able to use async/await everywhere
