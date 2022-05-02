@@ -4,7 +4,7 @@ import { expect } from "chai";
 /* eslint-disable node/no-missing-import */
 import { ethers } from "hardhat";
 import { deployContract, MockProvider } from "ethereum-waffle";
-import contractJson from "../artifacts/contracts/nat_token.sol/NatToken.json";
+import contractJson from "../artifacts/contracts/ERC20/nat_token.sol/NatToken.json";
 import { Contract } from "ethers";
 
 describe("Nat Token", () => {
