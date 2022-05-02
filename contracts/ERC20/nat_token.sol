@@ -129,7 +129,7 @@ contract NatToken is IERC20 {
   @params _owner is the the bearer of the account
   @params _spender is the address requesting to spend some tokens from _owner
    */
-    function allowance(address _owner, address _spender)
+    function allowance(address owner, address _spender)
         public
         view
         override
