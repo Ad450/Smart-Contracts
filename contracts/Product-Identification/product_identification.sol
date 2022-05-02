@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 /// @author Emmanuel
 /// @title Product Identification System
 /// @dev all functions are still under development
-contract ProductIndentification {
+contract ProductIdentification {
     /// @notice productAdded event will be fired when any product is added
     event ProductAdded();
 
@@ -23,14 +23,14 @@ contract ProductIndentification {
         bool isAdded;
     }
 
-    /// @notice keeping tracks of companies and their products
+    /// @notice keeps tracks of companies and their products
     /// @dev this mapping can be advanced with address => Product[]
     mapping(address => bytes32[]) private productStore;
 
-    /// @notice keeps track manufacturers and their public addresses
+    /// @notice keeps track of manufacturers and their public addresses
     mapping(string => address) private manufacturers;
 
-    /// @notice onlyManufacturer requires manufacturer to be registered
+    /// @notice ensures only manufacturers can add product
     /// @param _manufacturer is the name of the manufacturer
     /// @param _manufacturerAddress is the address of manufacturer
     modifier onlyManufacturer(
@@ -72,7 +72,7 @@ contract ProductIndentification {
         }
     }
 
-    /// @notice computeHash produces the hash of the id of the product
+    /// @notice produces the hash of the id of the product
     /// @param _productCode is the code of the product to be hashed
     /// @dev can be optimised to save gas
     /// @return _productHash the hash of the code of the product
@@ -105,8 +105,8 @@ contract ProductIndentification {
         return false;
     }
 
-    /// @notice register manufacturers by under their names
-    /// @param _manufacturer is the the name of the manufacturer
+    /// @notice register manufacturers under their names
+    /// @param _manufacturer is the name of the manufacturer
     /// @param _manufacturerAddress is the address of the manufacturer
     function registerManufacturer(
         string memory _manufacturer,
