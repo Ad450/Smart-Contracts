@@ -7,14 +7,14 @@ pragma solidity ^0.8.4;
 
 import "./nat_token.sol";
 
-contract NatTokenMintable is NatToken{
+contract NatTokenMintable is NatToken {
      /*
   @notice creates new token and adds to supply in circulation 
   @param _value is the amount of tokens to be added
   @param _supply is the total supply in circulation
    */
   function mint (uint _value, uint supply) public {
-      require (msg.sender == owner, "not authorized");
+      require (msg.sender == _owner, "not authorized");
       supply += _value;
   }
 }

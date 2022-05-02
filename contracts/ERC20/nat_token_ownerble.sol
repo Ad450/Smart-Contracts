@@ -8,10 +8,15 @@ pragma solidity ^0.8.4;
 import "./nat_token.sol";
 
 contract NatTokenOwnerble is NatToken {
-    address private override _owner;
+    address public _owner;
 
-    constructor() public {
+    constructor() {
         _owner = msg.sender;
+    }
+
+    modifier onlyOwner(address caller){
+        require(caller == _owner, "not authorise to perform operation");
+        _;
     }
 
     /// @notice to transfer ownership of contract to another address

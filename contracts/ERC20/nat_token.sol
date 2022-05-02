@@ -19,7 +19,7 @@ contract NatToken is IERC20 {
     uint256 private supply;
     uint8 private constant DECIMALS = 18;
 
-    address private _owner;
+    address internal _owner;
 
     mapping(address => uint256) public balances;
 
@@ -27,7 +27,7 @@ contract NatToken is IERC20 {
   @notice name is the a short description of the token
   @returns returns a string name
    */
-    function name() public view override returns (string memory) {
+    function name() public pure override returns (string memory) {
         return NAME;
     }
 
@@ -35,7 +35,7 @@ contract NatToken is IERC20 {
   @notice symbol is a ticker (a three or letter word) that represents the token
   @returns returns the symbol of the token
    */
-    function symbol() public view override returns (string memory) {
+    function symbol() public pure override returns (string memory) {
         return SYMBOL;
     }
 
@@ -43,7 +43,7 @@ contract NatToken is IERC20 {
   @notice decimals gives the smallest unit of the token
   @returns returns a number representing the number behind the decimal point
    */
-    function decimals() public view override returns (uint8) {
+    function decimals() public pure override returns (uint8) {
         return DECIMALS;
     }
 
@@ -60,7 +60,7 @@ contract NatToken is IERC20 {
   @params _owner is the address we want its balance
   @returns returns the balance of the address
    */
-    function balanceOf(address memory _caller)
+    function balanceOf(address  _caller)
         public
         view
         override
