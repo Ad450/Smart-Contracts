@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 /// @author Emmanuel
 /// @title Product Identification System
-/// @dev all functions are still under development
+/// @dev use openZeppelin safe math library to prevent overflow
 contract ProductIdentification {
     /// @notice productAdded event will be fired when any product is added
     event ProductAdded();
@@ -57,15 +57,18 @@ contract ProductIdentification {
         string memory _code,
         string memory _manufacturer
     ) public onlyManufacturer(_manufacturer, _manufacturerAddress) {
-        uint256 arrayLength = productStore[_manufacturerAddress].length;
+
+        bytes32[] memory store =  productStore[_manufacturerAddress];
+        uint256 arrayLength = store.length;
         bytes32 _productHash = _computeHash(_code);
 
         // checkif product already exist on chain
         for (uint256 i = 0; i < arrayLength; i++) {
-            if (_productHash == productStore[_manufacturerAddress][i]) {
+            if (_productHash == store[i]) {
                 revert("product already added");
                 // else product is not yet added
             } else {
+
                 productStore[_manufacturerAddress].push(_productHash);
                 emit ProductAdded();
             }
@@ -93,11 +96,12 @@ contract ProductIdentification {
         string memory _productCode,
         address _manufacturerAddress
     ) public view returns (bool) {
-        uint256 arrayLength = productStore[_manufacturerAddress].length;
+        bytes32[] memory store =  productStore[_manufacturerAddress];
+        uint256 arrayLength = store.length;
         bytes32 _productHash = _computeHash(_productCode);
 
         for (uint256 i = 0; i < arrayLength; i++) {
-            if (productStore[_manufacturerAddress][i] == _productHash) {
+            if (store[i] == _productHash) {
                 return true;
             }
         }
@@ -113,5 +117,31 @@ contract ProductIdentification {
         address _manufacturerAddress
     ) public {
         manufacturers[_manufacturer] = _manufacturerAddress;
+    }
+
+    /// @notice get all manufacturers registered with us 
+    /// @param _manufacturer is the name of the manufacturer
+    /// @dev check if @param _manufacturer is not empty 
+    function getManufacturers(string memory _manufacturer) public view returns (address){
+       require (bytes(_manufacturer).length >= 4, " name must be greater than 4");
+       return manufacturers[_manufacturer];
+    }
+
+    /// @notice get all products belonging to a manufacturer
+    /// @param _manufacturer address of manufacturer
+    /// @dev can replace with `searchProduct`
+    function getProduct(address _manufacturer, string memory _productCode) public view returns (bytes32){
+        bytes32[] memory _products = productStore[_manufacturer];
+        bytes32 _productHash = _computeHash(_productCode);
+
+        require(_products.length > 0, "no product found");
+
+        for(uint i = 0; i< _products.length; i++){
+            if(_productHash ==_products[i]){
+                return _productHash;
+            }
+        }
+
+        revert("product not found");
     }
 }
