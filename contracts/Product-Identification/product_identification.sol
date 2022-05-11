@@ -58,7 +58,7 @@ contract ProductIdentification {
         string memory _manufacturer
     ) public onlyManufacturer(_manufacturer, _manufacturerAddress) {
 
-        bytes32[] memory store =  productStore[_manufacturerAddress];
+        bytes32[] memory store = productStore[_manufacturerAddress];
         uint256 arrayLength = store.length;
         bytes32 _productHash = _computeHash(_code);
 
@@ -96,7 +96,7 @@ contract ProductIdentification {
         string memory _productCode,
         address _manufacturerAddress
     ) public view returns (bool) {
-        bytes32[] memory store =  productStore[_manufacturerAddress];
+        bytes32[] memory store = productStore[_manufacturerAddress];
         uint256 arrayLength = store.length;
         bytes32 _productHash = _computeHash(_productCode);
 
@@ -119,9 +119,9 @@ contract ProductIdentification {
         manufacturers[_manufacturer] = _manufacturerAddress;
     }
 
-    /// @notice get all manufacturers registered with us 
+    /// @notice get all manufacturers registered with us
     /// @param _manufacturer is the name of the manufacturer
-    /// @dev check if @param _manufacturer is not empty 
+    /// @dev check if @param _manufacturer is not empty
     function getManufacturers(string memory _manufacturer) public view returns (address){
        require (bytes(_manufacturer).length >= 4, " name must be greater than 4");
        return manufacturers[_manufacturer];
@@ -136,8 +136,8 @@ contract ProductIdentification {
 
         require(_products.length > 0, "no product found");
 
-        for(uint i = 0; i< _products.length; i++){
-            if(_productHash ==_products[i]){
+        for(uint i = 0; i < _products.length; i++){
+            if(_productHash == _products[i]){
                 return _productHash;
             }
         }
