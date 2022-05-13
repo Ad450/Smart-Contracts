@@ -60,10 +60,11 @@ contract MultisigWallet{
     // create transaction
     function createTransaction(address payable _to, uint _txId, uint _amount) public {
         require(isOwner[msg.sender], "not authorised");
-        emit TransactionCreated(_txId);
 
         transactionExist[_txId] = Transaction(_txId, false, 0, _to, _amount, false);
         transactions.push(Transaction(_txId, false, 0, _to, _amount, false));
+        
+        emit TransactionCreated(_txId);
     }
 
     // approve transaction 
