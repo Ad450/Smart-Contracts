@@ -5,7 +5,7 @@ pragma solidity ^0.8.4;
 /// @author Emmanuel
 /// @title Multisig
 /// @dev all contract functions are still under development
-contract Multisig{
+contract MultisigWallet{
     // owners of contract
     address[] public owners;
 
@@ -78,6 +78,7 @@ contract Multisig{
         require( transactionExist[_txId].approvals >= required, "waiting other approvals");
 
         _execute(_txId);
+
     }
 
     // execute transaction
@@ -91,5 +92,7 @@ contract Multisig{
 
       (bool success, ) =  _transaction.to.call{value: _transaction.amount}("");
       require(success, "transaction failed");
+
+      emit Executed(_txId);
     }
 }
