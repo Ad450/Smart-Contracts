@@ -45,7 +45,7 @@ contract MultisigWallet {
         required = _required;
     }
 
-    /// @notice represent a transaction object
+    /// @notice represents a transaction object
     /// @param txId is the unique id of the transaction
     /// @param isApproved checks whether transaction is approved or otherwise
     /// @param approvals is the number of owners that have approved the transaction
