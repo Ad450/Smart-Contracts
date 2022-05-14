@@ -56,9 +56,3 @@ describe("product identication contract test", () => {
     expect(result).equals(true);
   });
 });
-
-// uint256 id,
-// uint256 date,
-// address _manufacturerAddress,
-// string memory _code,
-// string memory _manufacturer
