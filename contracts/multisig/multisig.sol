@@ -32,9 +32,10 @@ contract MultisigWallet {
     /// @notice set owners of contract and give a required number for approval and execution
     /// @param _owners is an array of owners of contract
     /// @param _required is the required number of owners needed to approve and execute a transaction
-    constructor(address[] memory _owners, uint256 _required) payable {
+    constructor(address[] memory _owners, uint256 _required) {
         require(_owners.length > 0, "invalid owner array");
-        require(required > 0, "invalid required value");
+        require(!(_required <= 0), "invalid required value");
+        require(_required <= _owners.length, "invalid required value");
 
         for (uint256 i = 0; i < _owners.length; i++) {
             owners.push(_owners[i]);
