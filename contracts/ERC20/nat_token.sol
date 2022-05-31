@@ -60,12 +60,7 @@ contract NatToken is IERC20 {
   @params _owner is the address we want its balance
   @returns returns the balance of the address
    */
-    function balanceOf(address  _caller)
-        public
-        view
-        override
-        returns (uint256)
-    {
+    function balanceOf(address _caller) public view override returns (uint256) {
         require(_caller != address(0), "invalid address");
         return balances[_caller];
     }
