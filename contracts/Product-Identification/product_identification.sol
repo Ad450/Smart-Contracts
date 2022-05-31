@@ -27,8 +27,14 @@ contract ProductIdentification {
     /// @dev this mapping can be advanced with address => Product[]
     mapping(address => bytes32[]) private productStore;
 
+    /// @notice keeps track of product hash of added products
+    mapping(address => mapping(string => mapping(string => bytes32))) hashFactory;
+
     /// @notice keeps track of manufacturers and their public addresses
     mapping(string => address) private manufacturers;
+
+    /// @notice keeps to tracks of added product
+    mapping(address => mapping(string => bool)) addedProducts;
 
     /// @notice ensures only manufacturers can add product
     /// @param _manufacturer is the name of the manufacturer
@@ -47,32 +53,26 @@ contract ProductIdentification {
     /// @notice companies will add products with this method
     /// @param _manufacturer is the name of the manufacturer
     /// @param _code is a unique string found on the product
-    /// @param id is a unique nonce added to the product submission form
     /// @param _manufacturerAddress address of the manufacturer
     /// @dev function still under development
     function addProduct(
-        uint256 id,
-        uint256 date,
         address _manufacturerAddress,
         string memory _code,
         string memory _manufacturer
     ) public onlyManufacturer(_manufacturer, _manufacturerAddress) {
-
-        bytes32[] memory store = productStore[_manufacturerAddress];
-        uint256 arrayLength = store.length;
         bytes32 _productHash = _computeHash(_code);
 
         // checkif product already exist on chain
-        for (uint256 i = 0; i < arrayLength; i++) {
-            if (_productHash == store[i]) {
-                revert("product already added");
-                // else product is not yet added
-            } else {
+        require(
+            !addedProducts[_manufacturerAddress][_code],
+            " product already added"
+        );
+        productStore[_manufacturerAddress].push(_productHash);
+        addedProducts[_manufacturerAddress][_code] = true;
 
-                productStore[_manufacturerAddress].push(_productHash);
-                emit ProductAdded();
-            }
-        }
+        hashFactory[_manufacturerAddress][_manufacturer][_code] = _productHash;
+
+        emit ProductAdded();
     }
 
     /// @notice produces the hash of the id of the product
@@ -96,17 +96,12 @@ contract ProductIdentification {
         string memory _productCode,
         address _manufacturerAddress
     ) public view returns (bool) {
-        bytes32[] memory store = productStore[_manufacturerAddress];
-        uint256 arrayLength = store.length;
-        bytes32 _productHash = _computeHash(_productCode);
+        require(
+            addedProducts[_manufacturerAddress][_productCode],
+            " product not added"
+        );
 
-        for (uint256 i = 0; i < arrayLength; i++) {
-            if (store[i] == _productHash) {
-                return true;
-            }
-        }
-
-        return false;
+        return true;
     }
 
     /// @notice register manufacturers under their names
@@ -122,26 +117,36 @@ contract ProductIdentification {
     /// @notice get all manufacturers registered with us
     /// @param _manufacturer is the name of the manufacturer
     /// @dev check if @param _manufacturer is not empty
-    function getManufacturers(string memory _manufacturer) public view returns (address){
-       require (bytes(_manufacturer).length >= 4, " name must be greater than 4");
-       return manufacturers[_manufacturer];
+    function getManufacturers(string memory _manufacturer)
+        public
+        view
+        returns (address)
+    {
+        require(
+            bytes(_manufacturer).length >= 4,
+            " name must be greater than 4"
+        );
+        return manufacturers[_manufacturer];
     }
 
     /// @notice get all products belonging to a manufacturer
-    /// @param _manufacturer address of manufacturer
+    /// @param _manufacturerAddress address of manufacturer
+    /// @param _manufacturer name of manufacturer
+    /// @param _productCode code of product
     /// @dev can replace with `searchProduct`
-    function getProduct(address _manufacturer, string memory _productCode) public view returns (bytes32){
-        bytes32[] memory _products = productStore[_manufacturer];
-        bytes32 _productHash = _computeHash(_productCode);
+    function getProduct(
+        address _manufacturerAddress,
+        string memory _productCode,
+        string memory _manufacturer
+    ) public view returns (bytes32) {
+        require(
+            addedProducts[_manufacturerAddress][_productCode],
+            " product not added"
+        );
 
-        require(_products.length > 0, "no product found");
-
-        for(uint i = 0; i < _products.length; i++){
-            if(_productHash == _products[i]){
-                return _productHash;
-            }
-        }
-
-        revert("product not found");
+        bytes32 _productHash = hashFactory[_manufacturerAddress][_manufacturer][
+            _productCode
+        ];
+        return _productHash;
     }
 }
