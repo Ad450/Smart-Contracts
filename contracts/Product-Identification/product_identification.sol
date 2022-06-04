@@ -28,7 +28,8 @@ contract ProductIdentification {
     mapping(address => bytes32[]) private productStore;
 
     /// @notice keeps track of product hash of added products
-    mapping(address => mapping(string => mapping(string => bytes32))) hashFactory;
+    mapping(address => mapping(string => mapping(string => bytes32)))
+        private hashFactory;
 
     /// @notice keeps track of manufacturers and their public addresses
     mapping(string => address) private manufacturers;

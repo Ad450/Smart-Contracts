@@ -12,10 +12,10 @@ contract MultisigWallet {
     uint256 public required;
 
     /// @notice keeps track of owners of contract
-    mapping(address => bool) isOwner;
+    mapping(address => bool) private isOwner;
 
     /// @notice keeps track of already created transactionss
-    mapping(uint256 => Transaction) existingTransactions;
+    mapping(uint256 => Transaction) private existingTransactions;
 
     /// @notice returns true if transaction exist and false if otherwise
     mapping(uint256 => bool) private transactionExists;
@@ -132,5 +132,8 @@ contract MultisigWallet {
     }
 
     /// @notice receives ether coming from owners and or other addresses
-    receive() external payable {}
+    receive() external payable {
+        // preventing linting errors
+        require(msg.value > 0, "cannot receive");
+    }
 }
