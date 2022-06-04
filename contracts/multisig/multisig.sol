@@ -14,8 +14,11 @@ contract MultisigWallet {
     /// @notice keeps track of owners of contract
     mapping(address => bool) isOwner;
 
-    /// @notice keeps track of all transactions
-    mapping(uint256 => Transaction) transactionExist;
+    /// @notice keeps track of already created transactionss
+    mapping(uint256 => Transaction) existingTransactions;
+
+    /// @notice returns true if transaction exist and false if otherwise
+    mapping(uint256 => bool) private transactionExists;
 
     /// @notice keeps track of addresses that approve a transaction
     mapping(uint256 => mapping(uint256 => address)) public approvalAddress;
@@ -73,8 +76,9 @@ contract MultisigWallet {
         uint256 _amount
     ) public {
         require(isOwner[msg.sender], "not authorised");
+        require(!transactionExists[_txId], "transaction already exist");
 
-        transactionExist[_txId] = Transaction(
+        existingTransactions[_txId] = Transaction(
             _txId,
             false,
             0,
@@ -82,6 +86,8 @@ contract MultisigWallet {
             _amount,
             false
         );
+
+        transactionExists[_txId] = true;
         transactions.push(Transaction(_txId, false, 0, _to, _amount, false));
 
         emit TransactionCreated(_txId);
@@ -98,11 +104,11 @@ contract MultisigWallet {
         );
 
         approvalAddress[uint256(senderHash)][_txId] = msg.sender;
-        transactionExist[_txId].approvals++;
+        existingTransactions[_txId].approvals++;
         emit Approved(_txId, msg.sender);
 
         require(
-            transactionExist[_txId].approvals >= required,
+            existingTransactions[_txId].approvals >= required,
             "waiting other approvals"
         );
 
@@ -112,7 +118,7 @@ contract MultisigWallet {
     /// @notice does the sending of ether to receiver
     /// @param txId is the unique id of the transaction
     function _execute(uint256 txId) private {
-        Transaction storage _transaction = transactionExist[txId];
+        Transaction storage _transaction = existingTransactions[txId];
 
         require(!_transaction.executed, "transaction already executed");
         require(_transaction.approvals >= required, "transaction not approved");
