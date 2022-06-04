@@ -34,7 +34,10 @@ contract ProductIdentification {
     mapping(string => address) private manufacturers;
 
     /// @notice keeps to tracks of added product
-    mapping(address => mapping(string => bool)) addedProducts;
+    mapping(address => mapping(string => bool)) private addedProducts;
+
+    /// @notice all manufacturer addresses are tracked here
+    mapping(address => bool) private isManufacturer;
 
     /// @notice ensures only manufacturers can add product
     /// @param _manufacturer is the name of the manufacturer
@@ -115,18 +118,15 @@ contract ProductIdentification {
     }
 
     /// @notice get all manufacturers registered with us
-    /// @param _manufacturer is the name of the manufacturer
+    /// @param _manufacturer is the address of the manufacturer
     /// @dev check if @param _manufacturer is not empty
-    function getManufacturers(string memory _manufacturer)
+    function getManufacturers(address _manufacturer)
         public
         view
         returns (address)
     {
-        require(
-            bytes(_manufacturer).length >= 4,
-            " name must be greater than 4"
-        );
-        return manufacturers[_manufacturer];
+        require(isManufacturer[_manufacturer], " address not a manufacturer");
+        return _manufacturer;
     }
 
     /// @notice get all products belonging to a manufacturer
