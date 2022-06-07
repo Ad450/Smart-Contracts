@@ -16,7 +16,7 @@ contract NatToken is IERC20 {
 
     string private constant NAME = "Nat token";
     string private constant SYMBOL = "NAT";
-    uint256 private supply;
+    uint256 internal supply;
     uint8 private constant DECIMALS = 18;
 
     address internal _owner;
@@ -113,6 +113,7 @@ contract NatToken is IERC20 {
    */
     function approve(address _spender, uint256 _value)
         public
+        pure
         override
         returns (bool)
     {
@@ -126,7 +127,7 @@ contract NatToken is IERC20 {
    */
     function allowance(address owner, address _spender)
         public
-        view
+        pure
         override
         returns (uint256)
     {
@@ -137,7 +138,7 @@ contract NatToken is IERC20 {
     /*
   @notice adding new tokens 
    */
-    function mint(uint256 _value) private {
+    function mint(uint256 _value) internal virtual {
         require(msg.sender == _owner, "not authorized");
         supply += _value;
     }
