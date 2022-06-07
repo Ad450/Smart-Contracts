@@ -27,6 +27,7 @@ contract DExchange {
     }
 
     // functionality still immature, security and gas optimization will be done later
+    // will change function to conform to the constant product of uniswap
     function addLiqudity(
         address _token0,
         address _token1,
