@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 library SafeMath {
     // safe multiplication
-    function mul(uint256 a, uint256 b) public returns (uint256 result) {
+    function mul(uint256 a, uint256 b) public pure returns (uint256 result) {
         result = (a * b);
         require((result / a) == b, "incorrect multiplication");
 
@@ -11,7 +11,7 @@ library SafeMath {
     }
 
     // safe addition
-    function add(uint256 a, uint256 b) public returns (uint256 result) {
+    function add(uint256 a, uint256 b) public pure returns (uint256 result) {
         result = (a + b);
         require(result >= (a + b), "incorrect addition");
 
@@ -19,7 +19,7 @@ library SafeMath {
     }
 
     // safe division
-    function div(uint256 a, uint256 b) public returns (uint256 result) {
+    function div(uint256 a, uint256 b) public pure returns (uint256 result) {
         // where a is always the numerator
         require(b > 0, "indeterminate");
         result = (a / b);
@@ -29,7 +29,7 @@ library SafeMath {
     }
 
     // safe subtraction
-    function sub(uint256 a, uintb) public returns (uint256 result) {
+    function sub(uint256 a, uint256 b) public pure returns (uint256 result) {
         require(a > b, "negative result ");
         result = (a - b);
         require(result < a, "incorrect subtraction");
