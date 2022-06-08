@@ -1,8 +1,13 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.4;
 import "../ERC20/nat_token.sol";
+import "./libraries/safeMath.sol";
 
 contract NewDex {
+    using SafeMath for uint;
+    
+
+
     // using 0 address as token0 and token1 address
     address private constant tokenAddress =
         0x000000000000000000000000000000000000dEaD;
@@ -50,11 +55,36 @@ contract NewDex {
         token0.transfer(address(this), _amount0);
         token1.transfer(address(this), _amount1);
 
-        // updating state after transfer, possible reentrancy
+        _calculateOwnership();
+
+    }
+
+    funtion _calculateOwnership() private {
+        (uint256 _reserve0, uint256 _reserve1) = _getReserve();
 
         uint256 _percentOwned0 = (_amount0 / _reserve0);
         uint256 _percentOwned1 = (_amount1 / _reserve1);
         pool0Ownership[msg.sender] += _percentOwned0;
         pool1Ownership[msg.sender] += _percentOwned1;
+    }
+
+    // LP withdraws tokens from pool
+    function _withdrawLiquidity(uint256 _amount0, uint256 _amount1) private reentrancyGuard{
+        require(_amount0 && _amount1 > 0, "amount cant be 0 or less");
+        (uint256 _reserve0, uint256 _reserve1) = _getReserve();
+
+        
+        // calculating new ownership
+        uint256 _withdrawalPercent0 = (_amount0/_reserve0);
+        uint256 _withdrawalPercent1 = (_amount1/_reserve1);
+
+
+        pool0Ownership[msg.sender].sub(_withdrawalPercent0);
+        pool1Ownership[msg.sender] -= _withdrawalPercent1;
+
+        // update pool state
+        token0.balanceOf(address(this)) -= _amount0;
+        token1.balanceOf(address(this)) -= _amount1;
+
     }
 }
