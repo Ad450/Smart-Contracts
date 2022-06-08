@@ -9,9 +9,17 @@ contract DExchange is DexchangeERC20 {
     // amount of token1 in pool
     uint256 private reserve1;
 
+    // burn address
+    address payable private constant BURN =
+        payable(0x000000000000000000000000000000000000dEaD);
+
     // accummulate percentage deposit (lp - liquidity provider)
     mapping(address => uint256) private lpAccumulator0;
     mapping(address => uint256) private lpAccumulator1;
+
+    // accumulate incentives
+
+    mapping(address => uint256) incentives;
 
     // emit liquidityAdded
     event LiquidityAdded(uint256 _amount0, uint256 _amount1);
@@ -52,4 +60,14 @@ contract DExchange is DexchangeERC20 {
     function _mintDexchangeToken(uint256 _amount) private {
         mint(_amount);
     }
+
+    // will be used when pool provider decides to take out tokens
+    function burn(uint256 _amount) private {
+        BURN.transfer(_amount);
+    }
+
+    function _calcLPIncentive(address _lpAddress)
+        private
+        returns (uint256 incentive)
+    {}
 }
