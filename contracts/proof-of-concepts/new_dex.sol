@@ -27,7 +27,7 @@ contract NewDex {
     mapping(address => uint256) private poolOwnership1;
 
     // reentrancy locker
-    bool private locked;
+    bool private locked = false;
 
     modifier reentrancyGuard() {
         require(!locked, "reentrancy occured");
@@ -106,20 +106,27 @@ contract NewDex {
         view
         returns (uint256 _price0, uint256 _price1)
     {
-        require(_amount0 != _amount1, "provide amount of token to swap");
+        require(
+            (_amount0 > _amount1) || (_amount1 > _amount0),
+            "no liquidity event"
+        );
         (uint256 _reserve0, uint256 _reserve1) = _getReserve();
         uint256 _constantProduct = _reserve0.mul(_reserve1);
+        uint256 _newReserve1;
+        uint256 _newReserve0;
 
         if (_amount0 > _amount1) {
-            _reserve0.add(_amount0);
-            uint256 _newReserve0 = _constantProduct.div(_reserve0);
+            _price0 = _reserve0.div(_reserve0.add(_amount0));
+
+            _newReserve1 = _constantProduct.div(_reserve0);
+            _price1 = _reserve1.div(_newReserve1);
+        } else {
+            _reserve1.add(_amount1);
+            _newReserve0 = _constantProduct.div(_reserve1);
+            _price1 = _reserve1.div(_reserve1.add(_amount1));
+
             _price0 = _reserve0.div(_newReserve0);
         }
-
-        _reserve1.add(_amount1);
-        uint256 _newReserve1 = _constantProduct.div(_reserve1);
-        _price1 = _reserve1.div(_newReserve1);
-
         return (_price1, _price1);
     }
 }
