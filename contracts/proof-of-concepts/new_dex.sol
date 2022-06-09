@@ -23,8 +23,8 @@ contract NewDex {
     uint256 private reserve1;
 
     // track amount of each tokens owned by LPs
-    mapping(address => uint256) private pool0Ownership;
-    mapping(address => uint256) private pool1Ownership;
+    mapping(address => uint256) private poolOwnership0;
+    mapping(address => uint256) private poolOwnership1;
 
     // reentrancy locker
     bool private locked;
@@ -60,16 +60,19 @@ contract NewDex {
         token0.transfer(address(this), _amount0);
         token1.transfer(address(this), _amount1);
 
-        _calculateOwnership();
+        _calculateOwnership(_amount0, _amount1);
     }
 
-    function _calculateOwnership() private {
+    function _calculateOwnership(uint256 _amount0, uint256 _amount1)
+        private
+        view
+    {
         (uint256 _reserve0, uint256 _reserve1) = _getReserve();
 
         uint256 _percentOwned0 = (_amount0 / _reserve0);
         uint256 _percentOwned1 = (_amount1 / _reserve1);
-        pool0Ownership[msg.sender].add(_percentOwned0);
-        pool1Ownership[msg.sender].add(_percentOwned1);
+        poolOwnership0[msg.sender].add(_percentOwned0);
+        poolOwnership1[msg.sender].add(_percentOwned1);
     }
 
     // LP withdraws tokens from pool
@@ -77,43 +80,30 @@ contract NewDex {
         public
         reentrancyGuard
     {
-        require(_amount0 && _amount1 > 0, "amount cant be 0 or less");
+        require(_amount0 > 0, "amount cant be 0 or less");
+        require(_amount1 > 0, "amount cant be 0 or less");
         (uint256 _reserve0, uint256 _reserve1) = _getReserve();
 
-        // calculating new ownership
-        uint256 _withdrawalPercent0 = _amount0.div(_reserve0);
-        uint256 _withdrawalPercent1 = _amount1.div(_reserve1);
+        // amount of tokens owned by LP
+        uint256 _amountOwnedByLP0 = _reserve0.mul(poolOwnership0[msg.sender]);
+        uint256 _amountOwnedByLP1 = _reserve1.mul(poolOwnership1[msg.sender]);
 
-        // remaining percentage of LP
-        require(
-            pool0Ownership[msg.sender] >= _withdrawalPercent0,
-            "invalid amount 0"
-        );
-        require(
-            pool1Ownership[msg.sender] >= _withdrawalPercent1,
-            "invalid amount 1"
-        );
+        // amount to transfer to owner
+        uint256 _newAmountOwned0 = _amountOwnedByLP0.sub(_amount0);
+        uint256 _newAmountOwned1 = _amountOwnedByLP1.sub(_amount1);
 
-        pool0Ownership[msg.sender].sub(_withdrawalPercent0);
-        pool1Ownership[msg.sender].sub(_withdrawalPercent1);
+        // update pool ownership
+        poolOwnership0[msg.sender] = (_newAmountOwned0).div(_reserve0);
+        poolOwnership1[msg.sender] = (_newAmountOwned1).div(_reserve1);
 
-        // update pool state
-        token0.balanceOf(address(this)).sub(_amount0);
-        token1.balanceOf(address(this)).sub(_amount1);
-
-        // calculate amount of tokens to transfer
-        uint256 _amountToTransfer0 = _reserve0.mul(pool0Ownership[msg.sender]);
-        uint256 _amountToTransfer1 = _reserve1.mul(pool1Ownership[msg.sender]);
-
-        // _calculateNextPrice(_reserve0, _reserve1);
-
-        // transfer tokens
-        token0.transferFrom(address(this), msg.sender, _amountToTransfer0);
-        token1.transferFrom(address(this), msg.sender, _amountToTransfer1);
+        // transfer tokens back to owner , will add incentives when swap is added
+        token0.transferFrom(address(this), msg.sender, _amount0);
+        token1.transferFrom(address(this), msg.sender, _amount1);
     }
 
     function _calculateNextPrice(uint256 _amount0, uint256 _amount1)
         private
+        view
         returns (uint256 _price0, uint256 _price1)
     {
         require(_amount0 != _amount1, "provide amount of token to swap");
@@ -130,6 +120,6 @@ contract NewDex {
         uint256 _newReserve1 = _constantProduct.div(_reserve1);
         _price1 = _reserve1.div(_newReserve1);
 
-        return (_price1, price2);
+        return (_price1, _price1);
     }
 }
