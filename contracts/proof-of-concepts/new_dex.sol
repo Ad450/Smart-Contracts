@@ -118,11 +118,11 @@ contract NewDex {
         if (_amount0 > _amount1) {
             _price0 = _reserve0.div(_reserve0.add(_amount0));
 
-            _newReserve1 = _constantProduct.div(_reserve0);
+            _newReserve1 = _constantProduct.div(_reserve0.add(_amount0));
             _price1 = _reserve1.div(_newReserve1);
         } else {
-            _reserve1.add(_amount1);
-            _newReserve0 = _constantProduct.div(_reserve1);
+            
+            _newReserve0 = _constantProduct.div(_reserve1.add(_amount1));
             _price1 = _reserve1.div(_reserve1.add(_amount1));
 
             _price0 = _reserve0.div(_newReserve0);
@@ -146,5 +146,44 @@ contract NewDex {
         _price1 = _reserve1.div(_amountAfterWithdrawal1);
 
         return (_price0, _price1);
+    }
+
+  
+    
+    function _amountToGiveTrader(uint256 _amount, bool _is0, bool _is1) private view returns (uint256 _trade){
+         (uint256 _reserve0, uint256 _reserve1) = _getReserve();
+         uint256 _constantProduct = _reserve0.mul(_reserve1);
+
+         if(_is0){
+             uint256 _newReserve1 = _constantProduct.div(_reserve0.add(_amount));
+             _trade = _reserve1.sub(_newReserve1);
+         } 
+         if(_is1){
+             uint256 _newReserve0 = _constantProduct.div(_reserve1.add(_amount));
+             _trade = _reserve1.sub(_newReserve0);
+         }
+
+        return _trade;
+    }
+
+
+    function swap(uint256 _amount, bool _is0, bool _is1) public reentrancyGuard {
+         require(_amount > 0, "amount must not be 0 or less");
+        (uint256 _reserve0, uint256 _reserve1) = _getReserve();
+
+        if(_is0){
+            _reserve0.add(_amount);
+            _calculateNextSwapPrice(_amount, 0);
+            (uint256 _trade ) =_amountToGiveTrader(_amount, true, false);
+
+            token1.transfer(msg.sender, _trade);
+        }
+        if(_is1){
+            _reserve1.add(_amount);
+            _calculateNextSwapPrice(0, _amount);
+            (uint256 _trade ) =_amountToGiveTrader(_amount, false, true);
+
+            token0.transfer(msg.sender, _trade);
+        }
     }
 }
