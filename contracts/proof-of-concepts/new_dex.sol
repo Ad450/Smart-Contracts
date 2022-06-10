@@ -26,6 +26,14 @@ contract NewDex {
     mapping(address => uint256) private poolOwnership0;
     mapping(address => uint256) private poolOwnership1;
 
+    // calculate price params struct
+    struct CalculatePriceParams{
+        uint256 _amount0;
+        uint256 _amount1;
+        bool _isSwap;
+        bool _isWithdrawal;
+    }
+
     // reentrancy locker
     bool private locked = false;
 
@@ -122,32 +130,44 @@ contract NewDex {
     }
 
 
-    function swap(uint256 _amount, bool _is0, bool _is1) public reentrancyGuard {
+    function swap(uint256 _amount, bool _is0, bool _is1) external reentrancyGuard {
          require(_amount > 0, "amount must not be 0 or less");
         (uint256 _reserve0, uint256 _reserve1) = _getReserve();
 
         if(_is0){
             _reserve0.add(_amount);
-            _calculatePrice(_amount, 0, true, false);
+           
+            _calculatePrice(CalculatePriceParams(_amount, 0, true, false));
             (uint256 _trade ) =_amountToGiveTrader(_amount, true, false);
 
             token1.transfer(msg.sender, _trade);
         }
         if(_is1){
             _reserve1.add(_amount);
-            _calculatePrice(0, _amount, true, false);
+            _calculatePrice(CalculatePriceParams(0, _amount, true, false));
+           
             (uint256 _trade ) =_amountToGiveTrader(_amount, false, true);
 
             token0.transfer(msg.sender, _trade);
         }
     }
 
-    function _calculatePrice(uint256 _amount0, uint256 _amount1, bool _isSwap, bool _isWithdrawal) private view returns (uint256 _price0,uint256 _price1){
-
+    function _calculatePrice(CalculatePriceParams memory _calculatePriceParam) private view{
+    
         (uint256 _reserve0, uint256 _reserve1) = _getReserve();
 
-        if(_isSwap){
-            uint256 _constantProduct = _reserve0.mul(_reserve1);
+        if(_calculatePriceParam._isSwap){    
+          _calculatePriceAfterSwap(_calculatePriceParam._amount0, _calculatePriceParam._amount1, _reserve0, _reserve1);     
+     }
+
+      if(_calculatePriceParam._isWithdrawal){
+            _calculatePriceAfterWithdrawal(_calculatePriceParam._amount0, _calculatePriceParam._amount1, _reserve0, _reserve1);
+      }
+
+    }
+
+    function _calculatePriceAfterSwap( uint256 _amount0,uint256 _amount1, uint256 _reserve0, uint256 _reserve1) private pure returns (uint256 _price0, uint256 _price1) {
+          uint256 _constantProduct = _reserve0.mul(_reserve1);
             uint256 _newReserve1;
             uint256 _newReserve0;
 
@@ -163,17 +183,17 @@ contract NewDex {
 
                 _price0 = _reserve0.div(_newReserve0);
             }
-     }
 
-      if(_isWithdrawal){
-            uint256 _amountAfterWithdrawal0 = _reserve0.sub(_amount0);
+            return (_price0, _price1);
+    }   
+
+    function _calculatePriceAfterWithdrawal(uint256 _amount0, uint256 _amount1, uint256 _reserve0, uint256 _reserve1) private pure returns (uint256 _price0, uint256 _price1) {
+        uint256 _amountAfterWithdrawal0 = _reserve0.sub(_amount0);
             uint256 _amountAfterWithdrawal1 = _reserve1.sub(_amount1);
 
             _price0 = _reserve0.div(_amountAfterWithdrawal0);
             _price1 = _reserve1.div(_amountAfterWithdrawal1);
-      }
 
-      return (_price0, _price1);
-
+            return (_price0, _price1);
     }
 }
