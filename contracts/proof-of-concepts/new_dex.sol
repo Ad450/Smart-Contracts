@@ -64,6 +64,7 @@ contract NewDex {
         
     }
 
+    // tokens owned by LPs 
     function _calculateOwnership(uint256 _amount0, uint256 _amount1)
         private
         view
