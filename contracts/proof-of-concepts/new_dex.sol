@@ -101,7 +101,7 @@ contract NewDex {
         token1.transferFrom(address(this), msg.sender, _amount1);
     }
 
-    function _calculateNextPrice(uint256 _amount0, uint256 _amount1)
+    function _calculateNextSwapPrice(uint256 _amount0, uint256 _amount1)
         private
         view
         returns (uint256 _price0, uint256 _price1)
@@ -128,5 +128,23 @@ contract NewDex {
             _price0 = _reserve0.div(_newReserve0);
         }
         return (_price1, _price1);
+    }
+
+    // look for alternate solutions to calculating price
+    // if possible, merge the two price calculating functions
+    function _calculatePriceAfterWithdrawal(uint256 _amount0, uint256 _amount1)
+        private
+        view
+        returns (uint256 _price0, uint256 _price1)
+    {
+        (uint256 _reserve0, uint256 _reserve1) = _getReserve();
+
+        uint256 _amountAfterWithdrawal0 = _reserve0.sub(_amount0);
+        uint256 _amountAfterWithdrawal1 = _reserve1.sub(_amount1);
+
+        _price0 = _reserve0.div(_amountAfterWithdrawal0);
+        _price1 = _reserve1.div(_amountAfterWithdrawal1);
+
+        return (_price0, _price1);
     }
 }
