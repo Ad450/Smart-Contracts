@@ -147,30 +147,30 @@ contract NewDex {
         (uint256 _reserve0, uint256 _reserve1) = _getReserve();
 
         if(_isSwap){
-        uint256 _constantProduct = _reserve0.mul(_reserve1);
-        uint256 _newReserve1;
-        uint256 _newReserve0;
+            uint256 _constantProduct = _reserve0.mul(_reserve1);
+            uint256 _newReserve1;
+            uint256 _newReserve0;
 
-        if (_amount0 > _amount1) {
-            _price0 = _reserve0.div(_reserve0.add(_amount0));
+            if (_amount0 > _amount1) {
+                _price0 = _reserve0.div(_reserve0.add(_amount0));
 
-            _newReserve1 = _constantProduct.div(_reserve0.add(_amount0));
-            _price1 = _reserve1.div(_newReserve1);
-        } else {
-            
-            _newReserve0 = _constantProduct.div(_reserve1.add(_amount1));
-            _price1 = _reserve1.div(_reserve1.add(_amount1));
+                _newReserve1 = _constantProduct.div(_reserve0.add(_amount0));
+                _price1 = _reserve1.div(_newReserve1);
+            } else {
+                
+                _newReserve0 = _constantProduct.div(_reserve1.add(_amount1));
+                _price1 = _reserve1.div(_reserve1.add(_amount1));
 
-            _price0 = _reserve0.div(_newReserve0);
-        }
+                _price0 = _reserve0.div(_newReserve0);
+            }
      }
 
       if(_isWithdrawal){
-           uint256 _amountAfterWithdrawal0 = _reserve0.sub(_amount0);
-        uint256 _amountAfterWithdrawal1 = _reserve1.sub(_amount1);
+            uint256 _amountAfterWithdrawal0 = _reserve0.sub(_amount0);
+            uint256 _amountAfterWithdrawal1 = _reserve1.sub(_amount1);
 
-        _price0 = _reserve0.div(_amountAfterWithdrawal0);
-        _price1 = _reserve1.div(_amountAfterWithdrawal1);
+            _price0 = _reserve0.div(_amountAfterWithdrawal0);
+            _price1 = _reserve1.div(_amountAfterWithdrawal1);
       }
 
       return (_price0, _price1);
