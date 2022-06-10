@@ -2,6 +2,8 @@
 pragma solidity ^0.8.4;
 
 library SafeMath {
+    // update functions to check integer overflow and underflow
+
     // safe multiplication
     function mul(uint256 a, uint256 b) public pure returns (uint256 result) {
         result = (a * b);
