@@ -5,20 +5,26 @@ import "./libraries/safeMath.sol";
 
 contract Vault{
     using SafeMath for uint;
+    using SafeMath for uint8;
 
     address[] private _vaultMasters;
     uint private _requiredVaultMasters;
 
     mapping(address => uint256) private _allowance;
+    mapping(address => bool) private isVaultMaster;
+    mapping(uint => mapping(address => bool)) hasAuthorisedTransaction;
     
 
     // Transactions
     struct Transaction{
         address _to;
         address _from;
+        address _by;
+        address _tokenAddress;
         uint _amount;
         uint8 _id;
         uint8 _approvals;   
+
     }
 
     constructor (address[] memory vaultMasters, uint requiredVaultMasters) payable {
@@ -29,6 +35,7 @@ contract Vault{
 
         for(uint i = 0; i < vaultMasters.length; i++){
             _masters.push(vaultMasters[i]);
+            isVaultMaster[vaultMasters[i]] = true;
         }
         _required = requiredVaultMasters;
     }
@@ -69,7 +76,7 @@ contract Vault{
         
     }
 
-    function withdrawTokens (uint256 _amount, address _tokenAddress) external locked{
+    function _withdrawTokens (uint256 _amount, address _tokenAddress) private locked{
         require(_tokenAddress != address(0), "invalid address");
         IERC20 token = IERC20(_tokenAddress);
 
@@ -78,6 +85,26 @@ contract Vault{
         _allowance[msg.sender].sub(_amount);
 
         token.transferFrom(address(this), msg.sender, _amount);
+    }
+
+    function executeWithdrawal(Transaction memory _transaction) external locked {
+        if(_validateWithdrawal(_transaction)){
+            _withdrawTokens(_transaction._amount, _transaction._tokenAddress);
+        }
+
+    }
+
+    function _validateWithdrawal(Transaction memory _transaction) private view returns (bool validated){
+        if(_transaction._approvals >= _requiredVaultMasters){
+            return true;
+        }
+        return false;
+    }
+
+    function approveWithdrawal(Transaction memory _transaction) external view {
+        require(isVaultMaster[msg.sender], "not authorised");
+        require(hasAuthorisedTransaction[_transaction._id][msg.sender], "already approved");
+        _transaction._approvals.add(1);
     }
 
     receive() external payable {
