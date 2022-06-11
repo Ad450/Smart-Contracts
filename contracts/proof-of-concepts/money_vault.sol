@@ -103,8 +103,9 @@ contract Vault{
 
     function approveWithdrawal(Transaction memory _transaction) external view {
         require(isVaultMaster[msg.sender], "not authorised");
-        require(hasAuthorisedTransaction[_transaction._id][msg.sender], "already approved");
+        require(!hasAuthorisedTransaction[_transaction._id][msg.sender], "already approved");
         _transaction._approvals.add(1);
+        hasAuthorisedTransaction[_transaction._id][msg.sender] = true;
     }
 
     receive() external payable {
