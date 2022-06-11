@@ -12,7 +12,7 @@ contract Vault{
 
     mapping(address => uint256) private _allowance;
     mapping(address => bool) private isVaultMaster;
-    mapping(uint => mapping(address => bool)) hasAuthorisedTransaction;
+    mapping(uint => mapping(address => bool)) private hasAuthorisedTransaction;
     
 
     // Transactions
@@ -28,8 +28,9 @@ contract Vault{
     }
 
     constructor (address[] memory vaultMasters, uint requiredVaultMasters) payable {
-        require(vaultMasters.length >0 , "provide a valid array");
+        require(vaultMasters.length > 0 , "provide a valid array");
         require(_requiredVaultMasters > 0, "invalid required number");
+        require(vaultMasters.length == requiredVaultMasters, "invalid vault master array");
 
         (address[] storage _masters, uint _required) = _getVaultMasters();
 
@@ -101,7 +102,7 @@ contract Vault{
         return false;
     }
 
-    function approveWithdrawal(Transaction memory _transaction) external view {
+    function approveWithdrawal(Transaction memory _transaction) external {
         require(isVaultMaster[msg.sender], "not authorised");
         require(!hasAuthorisedTransaction[_transaction._id][msg.sender], "already approved");
         _transaction._approvals.add(1);
