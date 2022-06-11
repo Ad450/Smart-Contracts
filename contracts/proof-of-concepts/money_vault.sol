@@ -6,7 +6,41 @@ import "./libraries/safeMath.sol";
 contract Vault{
     using SafeMath for uint;
 
+    address[] private _vaultMasters;
+    uint private _requiredVaultMasters;
+
     mapping(address => uint256) private _allowance;
+    
+
+    // Transactions
+    struct Transaction{
+        address _to;
+        address _from;
+        uint _amount;
+        uint8 _id;
+        uint8 _approvals;   
+    }
+
+    constructor (address[] memory vaultMasters, uint requiredVaultMasters) payable {
+        require(vaultMasters.length >0 , "provide a valid array");
+        require(_requiredVaultMasters > 0, "invalid required number");
+
+        (address[] storage _masters, uint _required) = _getVaultMasters();
+
+        for(uint i = 0; i < vaultMasters.length; i++){
+            _masters.push(vaultMasters[i]);
+        }
+        _required = requiredVaultMasters;
+    }
+
+
+    // save gas (gas optimization)
+    function _getVaultMasters() private view returns (address[] storage _masters, uint _required){
+        _masters = _vaultMasters;
+        _required = _requiredVaultMasters;
+
+        return (_masters, _required);
+    }
 
 
     // _lock is false
@@ -43,7 +77,7 @@ contract Vault{
         
         _allowance[msg.sender].sub(_amount);
 
-        token.transfer(msg.sender, _amount);
+        token.transferFrom(address(this), msg.sender, _amount);
     }
 
     receive() external payable {
