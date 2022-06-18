@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: Unlicense
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 import "../ERC20/token_interface.sol";
 import "./dexchange_ERC20.sol";
@@ -46,8 +46,8 @@ contract DExchange is DexchangeERC20 {
         reserve0 += IERC20(_token0).balanceOf(address(this)) + _amount0;
         reserve1 += IERC20(_token1).balanceOf(address(this)) + _amount1;
 
-        IERC20(_token0).transfer(address(this), _amount0);
-        IERC20(_token1).transfer(address(this), _amount1);
+        IERC20(_token0).transferFrom(msg.sender, address(this), _amount0);
+        IERC20(_token0).transferFrom(msg.sender, address(this), _amount1);
 
         // accumulating percentage of provider
         uint256 _percentageDeposit0 = (_amount0 / reserve0) * 100;
